@@ -36,11 +36,11 @@ function _createModal(options) {
     const modal = document.createElement('div')
     modal.classList.add('vmodal')
     modal.insertAdjacentHTML('afterbegin', `        
-        <div class="modal-overlay">
+        <div class="modal-overlay" data-close="true">
             <div class="modal-window" style="width: ${options.width || DEFAULT_WIDTH}">
                 <div class="modal-header">
                     <span class="modal-title">${options.title || 'Окно'}</span>
-                    ${options.closable ? `<span class="modal-close">&times;</span>` : ''}
+                    ${options.closable ? `<span class="modal-close" data-close="true">&times;</span>` : ''}
                 </div>
                 <div class="modal-body" data-content>
                     ${options.content || ''}
@@ -59,8 +59,6 @@ $.modal = function(options) {
     //создадим приватную функцию _createModal и чтобы не загромаждать функцию, вынесем ее за пределы modal
     const ANIMATION_SPEED = 200
     const $modal = _createModal(options)
-    const overlay = document.querySelector('.modal-overlay')
-    const modalClose = document.querySelector('.modal-close')
     let closing = false
     let destroyed = false
 
@@ -70,28 +68,28 @@ $.modal = function(options) {
                 return console.log('Modal is destroyed');
             }
             !closing && $modal.classList.add('open')
-            overlay.setAttribute('data-close','true')
-            modalClose.setAttribute('data-close','true')
+            $modal.addEventListener('click', listener)
         },
         close() {
             closing = true
             $modal.classList.remove('open')
             $modal.classList.add('hide')
+            $modal.removeEventListener('click', listener)
             setTimeout(() => {
                 $modal.classList.remove('hide')
                 closing = false
-                overlay.setAttribute('data-close','')
-                modalClose.setAttribute('data-close','')
             }, ANIMATION_SPEED)},
     }
 
     const listener = event => {
         if (event.target.dataset.close) {
+            console.log('yguyyu')
             modal.close()
+            
         }
     }
 
-    $modal.addEventListener('click', listener)
+    
 
     return Object.assign(modal, {
         destroy() {
